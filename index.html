@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Payment Successful – Hexa Innovative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04030a;
+  --bg2:#07050f;
+  --purple:#7c3aed;
+  --violet:#a855f7;
+  --cyan:#06b6d4;
+  --blue:#3b82f6;
+  --neon:#22d3ee;
+  --white:#f8f8ff;
+  --muted:#8b8ba0;
+  --glass:rgba(255,255,255,0.04);
+  --glass-border:rgba(255,255,255,0.08);
+  --glow-purple:rgba(124,58,237,0.4);
+  --glow-cyan:rgba(6,182,212,0.35);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+#cursor{position:fixed;width:12px;height:12px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease,background .2s;mix-blend-mode:screen;transform:translate(-50%,-50%)}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1.5px solid rgba(6,182,212,.5);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .35s cubic-bezier(.23,1,.32,1),width .3s,height .3s,border-color .3s;transform:translate(-50%,-50%)}
+body:hover #cursor{opacity:1}
+
+/* SCROLL PROGRESS */
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--cyan));z-index:9997;width:0%;transition:width .1s}
+
+/* LOADING SCREEN */
+#loader{position:fixed;inset:0;background:var(--bg);z-index:9990;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;transition:opacity .8s ease, visibility .8s}
+#loader.hidden{opacity:0;visibility:hidden}
+.loader-hex{width:64px;height:64px;position:relative;animation:hexSpin 1.5s linear infinite}
+.loader-hex svg{width:100%;height:100%}
+.loader-text{font-family:'Syne',sans-serif;font-size:14px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;animation:pulse2 1.5s ease-in-out infinite}
+.loader-bar{width:200px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.loader-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:2px;animation:loadFill 2s ease forwards}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);background:rgba(4,3,10,.7)}
+.nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em}
+.nav-badge{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.1));border:1px solid rgba(124,58,237,.3);border-radius:100px;padding:6px 14px;font-size:12px;color:var(--violet);font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:6px}
+.nav-badge::before{content:'';width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:pulse2 1.5s ease-in-out infinite}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;position:relative;padding:120px 24px 80px;overflow:hidden}
+.particles-canvas{position:absolute;inset:0;pointer-events:none}
+
+.check-wrap{width:120px;height:120px;margin:0 auto 40px;position:relative}
+.check-outer{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(6,182,212,.1));border:2px solid rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;animation:checkPulse 2s ease-in-out infinite;position:relative}
+.check-outer::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(6,182,212,.15);animation:checkRing 2s ease-in-out infinite .3s}
+.check-outer::after{content:'';position:absolute;inset:-16px;border-radius:50%;border:1px solid rgba(124,58,237,.08);animation:checkRing 2s ease-in-out infinite .6s}
+.check-icon{width:48px;height:48px;color:var(--cyan)}
+
+.hero-label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.25em;color:var(--cyan);text-transform:uppercase;margin-bottom:20px;animation:fadeUp .8s ease .2s both}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(44px,7vw,88px);line-height:1;letter-spacing:-.03em;margin-bottom:20px;animation:fadeUp .8s ease .35s both}
+.hero h1 span{background:linear-gradient(135deg,var(--violet) 0%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(16px,2.5vw,22px);color:rgba(248,248,255,.6);max-width:560px;margin:0 auto 40px;line-height:1.6;animation:fadeUp .8s ease .5s both}
+.hero-desc{font-size:15px;color:var(--muted);margin-bottom:48px;animation:fadeUp .8s ease .65s both}
+
+.cta-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--purple),#6366f1);padding:16px 36px;border-radius:100px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff;border:none;cursor:none;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;animation:fadeUp .8s ease .8s both;box-shadow:0 0 40px rgba(124,58,237,.4),0 0 80px rgba(124,58,237,.15)}
+.cta-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .3s}
+.cta-btn:hover::before{opacity:1}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 0 60px rgba(124,58,237,.6),0 0 120px rgba(124,58,237,.25)}
+.cta-btn svg{width:18px;height:18px;animation:arrowBounce 1.5s ease-in-out infinite}
+
+/* GRID BACKGROUND */
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(124,58,237,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.06) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
+
+/* STEPS */
+.steps-section{padding:100px 24px;position:relative;max-width:1100px;margin:0 auto}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase;margin-bottom:16px;display:block}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,5vw,52px);letter-spacing:-.03em;margin-bottom:60px;line-height:1.1}
+.section-title span{background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.step-item{display:grid;grid-template-columns:80px 1fr;gap:0 32px;margin-bottom:48px;opacity:0;transform:translateY(40px);transition:opacity .7s ease,transform .7s ease}
+.step-item.visible{opacity:1;transform:none}
+
+.step-left{display:flex;flex-direction:column;align-items:center}
+.step-num{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.1));border:1px solid rgba(124,58,237,.4);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--violet);flex-shrink:0;position:relative}
+.step-num::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.5),rgba(6,182,212,.3));z-index:-1;opacity:0;transition:opacity .3s}
+.step-item:hover .step-num::before{opacity:1}
+.step-line{width:2px;flex:1;background:linear-gradient(180deg,rgba(124,58,237,.4) 0%,rgba(6,182,212,.1) 100%);margin:12px 0;min-height:40px}
+.step-last .step-line{display:none}
+
+.step-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:32px;transition:border-color .3s,transform .3s,box-shadow .3s;margin-bottom:8px}
+.step-card:hover{border-color:rgba(124,58,237,.4);transform:translateX(6px);box-shadow:0 8px 60px rgba(124,58,237,.12)}
+.step-card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;margin-bottom:12px;letter-spacing:-.02em}
+.step-card p{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:20px}
+.step-card ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.step-card ul li{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(248,248,255,.7)}
+.step-card ul li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0}
+
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.dl-item{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .3s,background .3s}
+.dl-item:hover{border-color:rgba(124,58,237,.4);background:rgba(124,58,237,.1)}
+.dl-item-name{font-size:13px;font-weight:600;color:var(--white);line-height:1.4}
+.dl-btn{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--purple),#6366f1);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#fff;cursor:none;border:none;width:fit-content;transition:transform .2s,box-shadow .2s;font-family:'DM Sans',sans-serif}
+.dl-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,.4)}
+.dl-btn svg{width:14px;height:14px}
+
+/* ANIMATED MOCKUPS */
+.mockup-window{background:rgba(10,10,25,.8);border:1px solid var(--glass-border);border-radius:12px;overflow:hidden}
+.mockup-bar{background:rgba(255,255,255,.04);padding:10px 16px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--glass-border)}
+.mockup-dot{width:8px;height:8px;border-radius:50%}
+.mockup-body{padding:16px;display:flex;flex-direction:column;gap:8px}
+.mockup-row{height:8px;border-radius:100px;background:rgba(255,255,255,.06)}
+.mockup-row.accent{background:linear-gradient(90deg,rgba(124,58,237,.4),rgba(6,182,212,.2));width:60%}
+.mockup-row.sm{width:45%}
+.upload-anim{border:2px dashed rgba(124,58,237,.4);border-radius:10px;padding:20px;text-align:center;font-size:13px;color:var(--muted);animation:uploadPulse 2s ease-in-out infinite;margin-top:8px}
+
+/* VIDEO SECTION */
+.video-section{padding:100px 24px;background:linear-gradient(180deg,var(--bg) 0%,rgba(7,5,15,1) 100%);position:relative}
+.video-section .inner{max-width:1100px;margin:0 auto}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:48px}
+.video-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;opacity:0;transform:translateY(40px)}
+.video-card.visible{opacity:1;transform:none}
+.video-card:hover{transform:translateY(-6px);border-color:rgba(6,182,212,.3);box-shadow:0 20px 60px rgba(6,182,212,.1)}
+.video-thumb{height:160px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(6,182,212,.1))}
+.video-thumb-pattern{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:20px 20px}
+.video-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.play-btn{width:52px;height:52px;background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .3s,background .3s}
+.video-card:hover .play-btn{transform:scale(1.1);background:rgba(124,58,237,.3)}
+.video-duration{position:absolute;bottom:10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,0,0,.7);padding:3px 8px;border-radius:6px;color:var(--white)}
+.video-info{padding:20px}
+.video-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan);margin-bottom:8px}
+.video-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px;line-height:1.3}
+.watch-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--violet);cursor:none;border:none;background:none;padding:0;font-family:'DM Sans',sans-serif;transition:gap .2s}
+.watch-btn:hover{gap:10px}
+
+/* DEVICES SECTION */
+.devices-section{padding:120px 24px;position:relative;overflow:hidden}
+.devices-section .inner{max-width:1200px;margin:0 auto}
+.devices-wrap{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:20px;margin-top:60px;padding:40px 0}
+
+.device{position:relative;animation:float 4s ease-in-out infinite}
+.device.tablet-l{animation-delay:-.5s}
+.device.tablet-r{animation-delay:-1.5s}
+.device.mobile{animation-delay:-2s}
+
+.desktop-frame{width:min(560px,72vw);background:#0d0d1a;border:2px solid rgba(255,255,255,.12);border-radius:16px 16px 0 0;padding:6px;position:relative}
+.desktop-frame::after{content:'';position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);width:60%;height:24px;background:#0d0d1a;border-radius:0 0 8px 8px;border:2px solid rgba(255,255,255,.12);border-top:none}
+.desktop-frame::before{content:'';position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);width:80%;height:8px;background:rgba(255,255,255,.06);border-radius:0 0 8px 8px}
+.desktop-screen{width:100%;aspect-ratio:16/10;background:linear-gradient(135deg,#0a0a1e,#0f0b1f);border-radius:10px;overflow:hidden;position:relative}
+.tablet-frame{width:min(160px,22vw);background:#0d0d1a;border:2px solid rgba(255,255,255,.12);border-radius:16px;padding:10px 6px;position:relative}
+.tablet-screen{width:100%;aspect-ratio:3/4;background:linear-gradient(135deg,#0a0a1e,#0f0b1f);border-radius:10px;overflow:hidden;position:relative}
+.mobile-frame{width:min(100px,14vw);background:#0d0d1a;border:2px solid rgba(255,255,255,.12);border-radius:24px;padding:12px 6px;position:relative}
+.mobile-frame::before{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:40%;height:4px;background:rgba(255,255,255,.15);border-radius:100px}
+.mobile-screen{width:100%;aspect-ratio:9/19;background:linear-gradient(135deg,#0a0a1e,#0f0b1f);border-radius:18px;overflow:hidden;position:relative}
+.screen-content{position:absolute;inset:0;overflow:hidden}
+.sc-nav{height:16%;background:rgba(124,58,237,.15);border-bottom:1px solid rgba(124,58,237,.2);display:flex;align-items:center;padding:0 8%}
+.sc-dot{width:5px;height:5px;border-radius:50%;background:var(--violet);margin-right:6px}
+.sc-hero{height:30%;background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(6,182,212,.05));display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px}
+.sc-hero-line{height:4px;border-radius:100px;background:linear-gradient(90deg,var(--purple),var(--cyan));width:60%}
+.sc-hero-line.sm{width:40%;opacity:.5}
+.sc-cards{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;height:30%;background:rgba(10,10,25,.5)}
+.sc-card{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.1);border-radius:4px}
+.sc-footer{height:14%;background:rgba(124,58,237,.05);border-top:1px solid rgba(124,58,237,.1)}
+.device-shadow{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:80%;height:20px;background:radial-gradient(ellipse,rgba(124,58,237,.3) 0%,transparent 70%);filter:blur(8px)}
+
+/* CTA SECTION */
+.cta-section{padding:120px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-section .inner{max-width:700px;margin:0 auto;position:relative;z-index:1}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(124,58,237,.15) 0%,transparent 70%);pointer-events:none}
+.cta-section h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;margin-bottom:20px;line-height:1.1}
+.cta-section p{color:var(--muted);font-size:16px;line-height:1.7;margin-bottom:48px;max-width:500px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:100px;border:1px solid var(--glass-border);color:var(--white);font-weight:600;font-size:14px;cursor:none;background:var(--glass);backdrop-filter:blur(12px);transition:border-color .3s,background .3s,transform .2s;font-family:'DM Sans',sans-serif}
+.btn-outline:hover{border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.1);transform:translateY(-2px)}
+
+/* FOOTER */
+footer{padding:60px 40px 40px;border-top:1px solid var(--glass-border);max-width:1200px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.footer-brand .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px}
+.footer-brand p{color:var(--muted);font-size:14px;line-height:1.7;max-width:260px}
+.footer-col h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px;color:var(--white)}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col ul li a{color:var(--muted);font-size:14px;text-decoration:none;transition:color .2s;cursor:none}
+.footer-col ul li a:hover{color:var(--cyan)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;gap:16px;padding-top:28px;border-top:1px solid var(--glass-border)}
+.footer-bottom p{color:var(--muted);font-size:13px}
+.socials{display:flex;gap:12px}
+.social-icon{width:36px;height:36px;border-radius:10px;background:var(--glass);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;cursor:none;transition:border-color .3s,background .3s,box-shadow .3s,transform .2s}
+.social-icon:hover{border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.1);box-shadow:0 0 20px rgba(124,58,237,.3);transform:translateY(-2px)}
+.social-icon svg{width:16px;height:16px;color:var(--muted);transition:color .2s}
+.social-icon:hover svg{color:var(--white)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes checkPulse{0%,100%{box-shadow:0 0 0 0 rgba(124,58,237,.4)}50%{box-shadow:0 0 0 20px rgba(124,58,237,0)}}
+@keyframes checkRing{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:.1;transform:scale(1.05)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes pulse2{0%,100%{opacity:.4}50%{opacity:1}}
+@keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+@keyframes uploadPulse{0%,100%{border-color:rgba(124,58,237,.4)}50%{border-color:rgba(6,182,212,.6)}}
+@keyframes hexSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes loadFill{from{width:0}to{width:100%}}
+@keyframes movingBorder{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes scanLine{from{transform:translateY(-100%)}to{transform:translateY(200%)}  }
+
+.moving-border{background:linear-gradient(270deg,var(--purple),var(--cyan),#6366f1,var(--purple));background-size:300% 300%;animation:movingBorder 4s ease infinite;padding:1px;border-radius:20px}
+.moving-border-inner{background:var(--bg2);border-radius:19px;padding:32px}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:16px 20px}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .devices-wrap{gap:10px}
+  .desktop-frame{width:min(400px,65vw)}
+}
+@media(max-width:640px){
+  nav{padding:14px 16px}
+  .step-item{grid-template-columns:56px 1fr;gap:0 16px}
+  .step-line{display:none}
+  .footer-grid{grid-template-columns:1fr}
+  .devices-wrap{flex-direction:column;align-items:center}
+  .desktop-frame{width:min(340px,90vw)}
+  .tablet-frame,.mobile-frame{display:none}
+  .footer-bottom{flex-direction:column;text-align:center}
+  nav .nav-badge span{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-hex">
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" stroke="url(#hexGrad)" stroke-width="2" fill="none"/>
+      <polygon points="32,12 50,22 50,42 32,52 14,42 14,22" stroke="rgba(6,182,212,0.3)" stroke-width="1" fill="none"/>
+      <text x="32" y="38" text-anchor="middle" fill="url(#hexGrad)" font-family="Syne" font-weight="800" font-size="16">H</text>
+      <defs>
+        <linearGradient id="hexGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#a855f7"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+  <div class="loader-text">Initializing Access</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">HEXA INNOVATIVE</div>
+  <div class="nav-badge">
+    <span>Access Granted</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas class="particles-canvas" id="particles"></canvas>
+  <div class="grid-bg"></div>
+
+  <div class="check-wrap" style="animation:fadeUp .8s ease .1s both">
+    <div class="check-outer">
+      <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="hero-label">Transaction Verified • Premium Unlocked</div>
+  <h1>Payment Successful 🎉<br/><span>Access Granted</span></h1>
+  <p class="hero-sub">Welcome to Hexa Innovative Premium Resources</p>
+  <p class="hero-desc">Your premium bundle is now unlocked successfully. Follow the guide below to get started.</p>
+  <a href="#steps" class="cta-btn">
+    Start Setup Guide
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<!-- STEPS -->
+<section id="steps" style="background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)">
+<div class="steps-section">
+  <span class="section-label">Setup Guide</span>
+  <h2 class="section-title">Get Started in<br/><span>5 Simple Steps</span></h2>
+
+  <!-- STEP 1 -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num">01</div>
+      <div class="step-line"></div>
+    </div>
+    <div>
+      <div class="step-card">
+        <h3>Download Premium Files</h3>
+        <p>Your complete premium bundle is ready. Download all resources below to your device.</p>
+        <div class="dl-grid">
+          <div class="dl-item">
+            <div class="dl-item-name">500+ Landing Page Bundle</div>
+            <button class="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download ZIP</button>
+          </div>
+          <div class="dl-item">
+            <div class="dl-item-name">Elementor Website Builder Pro</div>
+            <button class="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download ZIP</button>
+          </div>
+          <div class="dl-item">
+            <div class="dl-item-name">50+ Premium Plugins & Themes</div>
+            <button class="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download ZIP</button>
+          </div>
+          <div class="dl-item">
+            <div class="dl-item-name">Full Tutorial Videos</div>
+            <button class="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download ZIP</button>
+          </div>
+          <div class="dl-item">
+            <div class="dl-item-name">AI Developer Resources</div>
+            <button class="dl-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download ZIP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num">02</div>
+      <div class="step-line"></div>
+    </div>
+    <div>
+      <div class="step-card">
+        <h3>Extract ZIP Files</h3>
+        <p>Once downloaded, extract the ZIP archives to access your files.</p>
+        <ul>
+          <li>Right click the ZIP file</li>
+          <li>Click "Extract Here" or "Extract All"</li>
+          <li>Open the extracted folder</li>
+          <li>Locate the JSON template files</li>
+        </ul>
+        <div class="mockup-window">
+          <div class="mockup-bar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-row accent"></div>
+            <div class="mockup-row"></div>
+            <div class="mockup-row sm"></div>
+            <div class="mockup-row" style="width:70%"></div>
+            <div class="mockup-row" style="width:35%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num">03</div>
+      <div class="step-line"></div>
+    </div>
+    <div>
+      <div class="step-card">
+        <h3>Open WordPress Dashboard</h3>
+        <p>Login to your WordPress admin panel and navigate to the templates section.</p>
+        <ul>
+          <li>Login to WordPress Admin</li>
+          <li>Go to Templates in sidebar</li>
+          <li>Click "Saved Templates"</li>
+          <li>Click "Import Templates"</li>
+        </ul>
+        <div class="mockup-window">
+          <div class="mockup-bar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+            <div style="margin-left:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">wp-admin/admin.php?page=elementor-templates</div>
+          </div>
+          <div class="mockup-body">
+            <div style="display:grid;grid-template-columns:120px 1fr;gap:8px">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div class="mockup-row" style="width:90%;background:rgba(124,58,237,.2)"></div>
+                <div class="mockup-row" style="width:80%"></div>
+                <div class="mockup-row" style="width:85%"></div>
+                <div class="mockup-row accent" style="width:95%"></div>
+                <div class="mockup-row" style="width:70%"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div class="mockup-row accent"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <div style="height:40px;border-radius:6px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.15)"></div>
+                  <div style="height:40px;border-radius:6px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.1)"></div>
+                  <div style="height:40px;border-radius:6px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.1)"></div>
+                  <div style="height:40px;border-radius:6px;background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.1)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-item">
+    <div class="step-left">
+      <div class="step-num">04</div>
+      <div class="step-line"></div>
+    </div>
+    <div>
+      <div class="step-card">
+        <h3>Import Elementor JSON Files</h3>
+        <p>Upload your JSON template files through the Elementor import interface.</p>
+        <ul>
+          <li>Click "Import Templates"</li>
+          <li>Select your JSON file</li>
+          <li>Click "Import Now" to complete</li>
+        </ul>
+        <div class="upload-anim">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" style="color:var(--violet);margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div>Drop JSON file here or <span style="color:var(--violet);cursor:pointer">browse</span></div>
+          <div style="font-size:11px;margin-top:4px;color:rgba(139,139,160,.6)">.json files only • Max 50MB</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-item step-last">
+    <div class="step-left">
+      <div class="step-num" style="background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(124,58,237,.15));border-color:rgba(6,182,212,.5);color:var(--cyan)">05</div>
+      <div class="step-line"></div>
+    </div>
+    <div>
+      <div class="moving-border">
+        <div class="moving-border-inner">
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:22px;margin-bottom:12px;letter-spacing:-.02em">🚀 Launch Your Landing Page</h3>
+          <p style="color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:16px">Your templates are imported. Time to build and publish!</p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(248,248,255,.7)"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;display:inline-block"></span>Create a New Page in WordPress</li>
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(248,248,255,.7)"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;display:inline-block"></span>Click "Edit with Elementor"</li>
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(248,248,255,.7)"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;display:inline-block"></span>Open Template Library → My Templates</li>
+            <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(248,248,255,.7)"><span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;display:inline-block"></span>Insert Landing Page → Publish! 🎉</li>
+          </ul>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(6,182,212,.15),rgba(124,58,237,.1));border:1px solid rgba(6,182,212,.3);border-radius:12px;padding:12px 18px;font-size:14px;color:var(--cyan);font-weight:600">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            You're all set! Your site is live.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- VIDEO SECTION -->
+<section class="video-section">
+<div class="inner">
+  <span class="section-label">Tutorial Library</span>
+  <h2 class="section-title">Premium<br/><span>Video Guides</span></h2>
+  <div class="video-grid" id="video-grid">
+    <!-- generated by JS -->
+  </div>
+</div>
+</section>
+
+<!-- DEVICES SECTION -->
+<section class="devices-section">
+<div class="inner">
+  <div style="text-align:center;margin-bottom:20px">
+    <span class="section-label" style="display:inline-block">Responsive Preview</span>
+    <h2 class="section-title" style="text-align:center">Looks Perfect<br/><span>On Every Device</span></h2>
+  </div>
+  <div class="devices-wrap">
+    <!-- Desktop -->
+    <div class="device">
+      <div class="desktop-frame">
+        <div class="desktop-screen">
+          <div class="screen-content">
+            <div class="sc-nav"><div class="sc-dot"></div><div style="height:3px;width:30%;background:rgba(255,255,255,.1);border-radius:100px"></div></div>
+            <div class="sc-hero"><div class="sc-hero-line"></div><div class="sc-hero-line sm"></div></div>
+            <div class="sc-cards">
+              <div class="sc-card"></div><div class="sc-card"></div><div class="sc-card"></div><div class="sc-card"></div>
+            </div>
+            <div class="sc-footer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-shadow"></div>
+    </div>
+    <!-- Tablet Left -->
+    <div class="device tablet-l" style="align-self:center">
+      <div class="tablet-frame">
+        <div class="tablet-screen">
+          <div class="screen-content">
+            <div class="sc-nav"></div>
+            <div class="sc-hero"><div class="sc-hero-line"></div><div class="sc-hero-line sm"></div></div>
+            <div class="sc-cards" style="grid-template-columns:1fr"><div class="sc-card"></div><div class="sc-card"></div></div>
+            <div class="sc-footer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-shadow"></div>
+    </div>
+    <!-- Mobile -->
+    <div class="device mobile" style="align-self:flex-end">
+      <div class="mobile-frame">
+        <div class="mobile-screen">
+          <div class="screen-content">
+            <div class="sc-nav" style="height:10%"></div>
+            <div class="sc-hero" style="height:25%"><div class="sc-hero-line"></div><div class="sc-hero-line sm"></div></div>
+            <div style="padding:4px;display:flex;flex-direction:column;gap:3px;flex:1">
+              <div class="sc-card" style="flex:1;background:rgba(124,58,237,.1);border-radius:4px"></div>
+              <div class="sc-card" style="flex:1;background:rgba(6,182,212,.05);border-radius:4px"></div>
+              <div class="sc-card" style="flex:1;background:rgba(124,58,237,.06);border-radius:4px"></div>
+            </div>
+            <div class="sc-footer" style="height:10%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="device-shadow"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- CTA SECTION -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <div class="inner">
+    <span class="section-label" style="display:inline-block;margin-bottom:24px">What's Next</span>
+    <h2>Ready to Build Your<br/><span style="background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Next AI Website?</span></h2>
+    <p>Hexa Innovative helps creators, developers, and businesses launch premium AI-powered platforms with cutting-edge design and technology.</p>
+    <div class="cta-btns">
+      <button class="cta-btn" style="animation:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Join Community
+      </button>
+      <button class="btn-outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Contact Support
+      </button>
+      <button class="btn-outline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Start Building
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo">HEXA INNOVATIVE</div>
+      <p>Building the future of AI-powered digital experiences. Premium tools for modern developers and businesses.</p>
+      <div class="socials" style="margin-top:20px">
+        <div class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16"><path d="M24 4.56v14.91A4.536 4.536 0 0119.44 24H4.56A4.536 4.536 0 010 19.44V4.56A4.536 4.536 0 014.56 0h14.91A4.536 4.536 0 0124 4.56zm-7.2 1.44h-2.16c-.792 0-.96.384-.96.936V8.4H16.8l-.264 2.4H13.68V18h-2.4v-7.2H9.6V8.4h1.68V6.792C11.28 5.016 12.36 4.08 13.944 4.08c.768 0 1.536.072 2.304.144V6z"/></svg></div>
+        <div class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></div>
+        <div class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+        <div class="social-icon"><svg viewBox="0 0 24 24" fill="currentColor" width="16"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">Developer Services</a></li>
+        <li><a href="#">AI Tools</a></li>
+        <li><a href="#">Web Apps</a></li>
+        <li><a href="#">Mobile Apps</a></li>
+        <li><a href="#">Automation</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="#">Premium Resources</a></li>
+        <li><a href="#">Templates</a></li>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">Tutorials</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Hexa Innovative. All rights reserved. Built for the future.</p>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(139,139,160,.5)">v2.5.0 • Premium Access</div>
+  </div>
+</footer>
+
+<script>
+// ─── LOADER ────────────────────────────────────
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+  },2200);
+});
+
+// ─── CURSOR ─────────────────────────────────────
+const cursor=document.getElementById('cursor');
+const cursorRing=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  cursorRing.style.left=rx+'px';cursorRing.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('button,a,.social-icon').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursorRing.style.width='52px';cursorRing.style.height='52px';cursorRing.style.borderColor='rgba(124,58,237,.7)';
+    cursor.style.transform='translate(-50%,-50%) scale(2)';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursorRing.style.width='36px';cursorRing.style.height='36px';cursorRing.style.borderColor='rgba(6,182,212,.5)';
+    cursor.style.transform='translate(-50%,-50%) scale(1)';
+  });
+});
+
+// ─── SCROLL PROGRESS ────────────────────────────
+window.addEventListener('scroll',()=>{
+  const prog=document.getElementById('progress-bar');
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  prog.style.width=(window.scrollY/h*100)+'%';
+});
+
+// ─── SCROLL REVEAL ──────────────────────────────
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*80);
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.step-item,.video-card').forEach(el=>obs.observe(el));
+
+// ─── PARTICLES ──────────────────────────────────
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+let pts=[];
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+for(let i=0;i<80;i++){
+  pts.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*1.5+.5,
+    dx:(Math.random()-.5)*.3,
+    dy:(Math.random()-.5)*.3,
+    o:Math.random()*.5+.1,
+    col:Math.random()>.5?'rgba(124,58,237,':'rgba(6,182,212,'
+  });
+}
+function animParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  pts.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.col+p.o+')';
+    ctx.fill();
+    p.x+=p.dx;p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+  });
+  // connect nearby
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x,pts[i].y);
+        ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(124,58,237,${.08*(1-d/100)})`;
+        ctx.lineWidth=.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ─── VIDEO CARDS ────────────────────────────────
+const videos=[
+  {title:'How to Import Templates',dur:'8:24',num:'01'},
+  {title:'Elementor Setup Guide',dur:'12:10',num:'02'},
+  {title:'Mobile Responsive Setup',dur:'7:45',num:'03'},
+  {title:'Speed Optimization',dur:'9:30',num:'04'},
+  {title:'Plugin Installation',dur:'5:55',num:'05'},
+  {title:'Hosting Setup & Config',dur:'11:20',num:'06'},
+  {title:'Full Landing Page Tutorial',dur:'24:15',num:'07'},
+];
+const colors=[
+  'linear-gradient(135deg,rgba(124,58,237,.3),rgba(6,182,212,.1))',
+  'linear-gradient(135deg,rgba(6,182,212,.2),rgba(59,130,246,.1))',
+  'linear-gradient(135deg,rgba(99,102,241,.3),rgba(168,85,247,.1))',
+  'linear-gradient(135deg,rgba(168,85,247,.2),rgba(6,182,212,.15))',
+  'linear-gradient(135deg,rgba(59,130,246,.25),rgba(124,58,237,.1))',
+  'linear-gradient(135deg,rgba(6,182,212,.25),rgba(99,102,241,.1))',
+  'linear-gradient(135deg,rgba(124,58,237,.35),rgba(59,130,246,.1))',
+];
+const grid=document.getElementById('video-grid');
+videos.forEach((v,i)=>{
+  const card=document.createElement('div');
+  card.className='video-card';
+  card.style.transitionDelay=(i*.08)+'s';
+  card.innerHTML=`
+    <div class="video-thumb" style="background:${colors[i%colors.length]}">
+      <div class="video-thumb-pattern"></div>
+      <div class="video-play">
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" style="color:white;margin-left:3px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+      </div>
+      <div class="video-duration">${v.dur}</div>
+    </div>
+    <div class="video-info">
+      <div class="video-num">Tutorial ${v.num}</div>
+      <div class="video-title">${v.title}</div>
+      <button class="watch-btn">
+        Watch Now
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>`;
+  grid.appendChild(card);
+  setTimeout(()=>obs.observe(card),10);
+});
+
+// ─── SMOOTH SCROLL ──────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
